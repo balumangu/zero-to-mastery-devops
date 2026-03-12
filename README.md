@@ -10,9 +10,7 @@ Welcome to my DevOps learning journey! This repository tracks my progress from i
 ## 🗂️ Roadmap
 
 **01. Terraform (Infrastructure as Code)**
-- [ ] *Level 1:* Static Web Architecture (Flat files, EC2 bootstrapping).
-- [ ] *Level 2:* Modular HA Architecture (Custom VPC modules, ALB, ASG).
-- [ ] *Level 3:* Advanced Production (S3 Remote State, DynamoDB locking, Multi-env).
+- [ ] AWS architecture provisioning, custom modules, and remote state management.
 
 **02. Ansible (Configuration Management)**
 - [ ] Playbooks, Dynamic Inventory, and Server Configuration.
