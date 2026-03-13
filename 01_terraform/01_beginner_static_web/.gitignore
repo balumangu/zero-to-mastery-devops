@@ -1,0 +1,15 @@
+# Ignore local Terraform directory and plugins
+.terraform/
+.terraform.lock.hcl
+
+# Ignore state files (highly sensitive, contains secrets in plain text)
+*.tfstate
+*.tfstate.*
+
+# Ignore variable files that might contain secrets
+*.tfvars
+*.tfvars.json
+
+# Ignore crash logs
+crash.log
+EOF
