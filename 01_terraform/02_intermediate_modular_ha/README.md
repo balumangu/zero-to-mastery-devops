@@ -10,7 +10,7 @@ This project upgrades the foundational static web architecture into a production
   - **Private Tier:** Secures the EC2 instances, ensuring they have no direct public IP addresses.
 - **NAT Gateway & Routing:** Configured to allow private instances to securely reach out to the internet for package updates without exposing them to inbound traffic.
 - **Application Load Balancer (ALB):** Serves as the single point of entry, terminating public web traffic and evenly distributing it to healthy backend targets.
-- **Auto Scaling Group (ASG):** Utilizes a Launch Template to automatically manage a fleet of Amazon Linux 2 instances, maintaining a strict desired capacity of 2.
+- **Auto Scaling Group (ASG):** Utilizes a Launch Template to automatically manage a fleet of Ubuntu instances, maintaining a strict desired capacity of 2.
 
 ---
 
