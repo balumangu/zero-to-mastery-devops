@@ -14,3 +14,19 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "asg_min" {
+  type = number
+}
+
+variable "asg_max" {
+  type = number
+}
+
+variable "asg_desired" {
+  type = number
+}
+
+variable "environment" {
+  type = string
+}
