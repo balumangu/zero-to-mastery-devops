@@ -9,6 +9,8 @@
 # Ignore variable files that might contain secrets
 *.tfvars
 *.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
 
 # Ignore crash logs
 crash.log
