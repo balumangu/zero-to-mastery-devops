@@ -3,6 +3,15 @@
 ## 🎯 Project Overview
 This project provisions a production-grade, Highly Available Python web application on AWS using fully modular Terraform. The application accepts user registrations via an HTML form and persists the data to a MySQL database. The architecture enforces a strict zero-trust security model — no EC2 instance is publicly accessible, SSH is replaced entirely by AWS Systems Manager (SSM), and every layer only communicates with the layer directly behind it.
 
+## 🚀 Key Technical Achievements
+* **Zero-SSH Architecture:** Entirely eliminated Port 22 and replaced it with **AWS Systems Manager (SSM)** for audited, keyless shell access.
+* **True Multi-Tier Isolation:** Compute and Database layers reside in private subnets with **Zero Public IP addresses**.
+* **Infrastructure as Code (IaC):** 100% modular Terraform with **Remote State Management** in S3 and **State Locking** via DynamoDB.
+* **Automated Deployment:** Implemented a custom Terraform-based CI/CD trigger that packages application code and deploys via S3 upon `terraform apply`.
+* **Dynamic Scaling:** Environment-specific scaling (1 instance for Dev vs. 2–6 for Prod) using CloudWatch CPU alarms and ASG policies.
+
+---
+
 ## 🏗️ Architecture Breakdown
 - **Reusable Modules:** Every layer — networking, security groups, load balancer, compute, database, and storage — is abstracted into its own Terraform module. Zero hardcoded values.
 - **Two Environments:** `dev` and `prod` are driven entirely by `environments/dev.tfvars` and `environments/prod.tfvars`.
@@ -50,7 +59,7 @@ This project provisions a production-grade, Highly Available Python web applicat
 
 ### Step 5: App Deployment via S3 (`modules/s3`)
 **What I Did:** Used a `null_resource` with `local-exec` to zip the application and upload it to S3 during `terraform apply`. Used `filemd5` triggers to detect code changes.
-**Rationale:** This treats the application code as an immutable artifact. Updating the app is now a single-command process: `terraform apply`.
+**Rationale:** This treats the application code as an immutable artifact. Updating the app is now a single-command process.
 
 ### Step 6: The Database Layer (`modules/rds`)
 **What I Did:** Provisioned RDS MySQL in a private DB Subnet Group. Multi-AZ is enabled in production for automatic failover.
@@ -64,61 +73,60 @@ This project provisions a production-grade, Highly Available Python web applicat
 |---------|-----|------|
 | VPC CIDR | 10.0.0.0/16 | 10.1.0.0/16 |
 | EC2 instance type | t3.micro | t3.micro |
-| ASG min / desired / max | 1 / 1 / 2 | 2 / 2 / 6 |
+| ASG min / desired / max | 1 / 1 / 1 | 2 / 2 / 3 |
 | CPU scale-up threshold | 70% | 60% |
 | RDS Multi-AZ | false | true |
 
 ---
 
-## 📸 Proof of Execution
+## ✅ Proof of Execution
 
-### 1. Terraform Init
+### 1. Infrastructure Provisioning
 ![Terraform Init](./screenshots/01_terraform_init.png)
+*Terraform initialization of local and remote providers.*
 
-### 2. Terraform Plan
 ![Terraform Plan](./screenshots/02_terraform_plan.png)
+*Architectural blueprint verification before deployment.*
 
-### 3. Terraform Apply Complete
 ![Terraform Apply](./screenshots/03_terraform_apply.png)
+*Full stack deployment including NAT Gateways, ALB, ASG, and RDS.*
 
-### 4. S3 — State File and App Zip
-![S3 Bucket](./screenshots/04_s3_state_and_zip.png)
+### 2. Application Functionality
+![ALB Live App](./screenshots/04_alb_live_app.png)
+*Live Flask application accessible via the Load Balancer DNS. The visit counter confirms RDS connectivity.*
 
-### 5. ALB Active
-![ALB Active](./screenshots/05_alb_active.png)
+### 3. High Availability & Health
+![Target Group Healthy](./screenshots/05_target_group_healthy.png)
+*Target Group showing multiple healthy instances across different Availability Zones.*
 
-### 6. Target Group — Both Instances Healthy
-![Target Group Healthy](./screenshots/06_target_group_healthy.png)
+### 4. Zero-Trust Security Verification
+![Private EC2 Isolation](./screenshots/06_private_instances_no_public_ip.png)
+*Proof of private subnet isolation: EC2 instances have zero public IP addresses.*
 
-### 7. EC2 Instances — Private Subnets, No Public IP
-![Private EC2](./screenshots/07_ec2_private_no_public_ip.png)
+![Security Group Lockdown](./screenshots/07_security_group_lockdown.png)
+*Inbound rules restricted to ALB traffic only. Port 22 (SSH) is completely removed.*
 
-### 8. SSM Session — Accessing Private EC2
-![SSM Access](./screenshots/08_ssm_session.png)
+![SSM Local Terminal Access](./screenshots/08_ssm_local_terminal_access.png)
+*Secure shell access to private instances via AWS SSM Session Manager from a local terminal.*
 
-### 9. RDS Available
-![RDS Available](./screenshots/09_rds_available.png)
+### 5. Backend & Artifact Management
+![S3 Remote State](./screenshots/09_s3_remote_state_storage.png)
+*Terraform state managed remotely in S3 for team collaboration and disaster recovery.*
 
-### 10. Auto Scaling Group
-![ASG Console](./screenshots/10_asg_console.png)
+![S3 Application Artifacts](./screenshots/10_s3_application_artifact.png)
+*Automated artifact packaging: `app.zip` stored in S3 for immutable deployments.*
 
-### 11. Live App — Registration Form
-![Live App](./screenshots/11_live_app_form.png)
-
-### 12. Form Submission Saved to RDS
-![Form Submission](./screenshots/12_form_submission.png)
-
-### 13. High Availability Test — ASG Self-Healing
-![ASG Self Healing](./screenshots/13_asg_self_healing.png)
-
-### 14. Terraform Destroy Complete
-![Terraform Destroy](./screenshots/14_terraform_destroy.png)
+![RDS Private Connectivity](./screenshots/11_rds_private_connectivity.png)
+*Database isolation: RDS is strictly private and unreachable from the internet.*
 
 ---
 
 ## 🧠 Lessons Learned
-- **SSM over SSH:** Eliminating Port 22 removes the primary target for brute-force attacks while providing superior audit logs.
-- **S3 as App Delivery:** Automating the zip-and-upload process via `local-exec` ensures the infrastructure and application version are always in sync.
-- **Locked-down Egress:** Restricting outbound traffic to only required AWS services (SSM/S3) minimizes the blast radius of a potential compromise.
-- **`filemd5` triggers:** Using file hashes as triggers ensures Terraform only performs work when the code actually changes, making deployments efficient.
-- **Interactive password prompt:** Keeping sensitive data out of `.tfvars` files by forcing interactive prompts is a simple yet effective way to maintain secret security.
+
+1.  **Account-Level Persistence:** Learned that certain AWS settings, such as the `ebs_default_kms_key`, persist even after `terraform destroy`. Used `aws ec2 modify-ebs-default-kms-key-id --kms-key-id alias/aws/ebs` to restore account defaults and fix "Access Denied" boot loops.
+2.  **OS Compatibility (Ubuntu 24.04):** Encountered package manager conflicts with `needrestart`. Resolved by configuring `UCF_FORCE_CONFOLD=1` to ensure non-interactive, automated `user_data` execution.
+3.  **Modular Variable Injection:** Mastered the pattern of bridging variables from `.tfvars` through the **Root Module** into **Child Modules**, enabling seamless environment-switching (Dev vs. Prod).
+4.  **SSM over SSH:** Discovered the security benefits of AWS Systems Manager, which removes the overhead of managing SSH keys while providing superior audit logs and security.
+5.  **State Management:** Experienced the critical importance of S3 Remote Backends to prevent state corruption during complex 3-level architectural changes.
+
+---

@@ -39,11 +39,15 @@ module "s3" {
 
 module "asg" {
   source = "../modules/asg"
+  environment = var.environment
+
+  asg_min         = var.asg_min
+  asg_max         = var.asg_max
+  asg_desired     = var.asg_desired
 
   private_subnets = module.networking.private_subnets
   ec2_sg          = module.security_groups.ec2_sg
 
-  # 🔥 FIX THIS LINE (match alb output)
   tg_arn = module.alb.target_group_arn
 
   db_host = module.rds.db_endpoint

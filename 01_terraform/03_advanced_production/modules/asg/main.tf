@@ -44,16 +44,46 @@ user_data = base64encode(templatefile(var.user_data, {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  desired_capacity = 2
-  max_size         = 2
-  min_size         = 2
+  min_size         = var.asg_min
+  max_size         = var.asg_max
+  desired_capacity = var.asg_desired
+
+  # IMPORTANT: Ensure health_check_type is set to ELB 
+  # so the ASG knows to scale/replace based on the App status
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
 
   vpc_zone_identifier = var.private_subnets
 
+  target_group_arns = [var.tg_arn]
   launch_template {
     id      = aws_launch_template.lt.id
     version = "$Latest"
   }
+}
 
-  target_group_arns = [var.tg_arn]
+resource "aws_autoscaling_policy" "scale_up" {
+  name                   = "${var.environment}-scale-up"
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "${var.environment}-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "70" # Scale up at 70% CPU
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.asg.name
+  }
+
+  alarm_description = "This metric monitors ec2 cpu utilization"
+  alarm_actions     = [aws_autoscaling_policy.scale_up.arn]
 }
