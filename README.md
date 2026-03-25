@@ -10,7 +10,7 @@ Welcome to my DevOps learning journey! This repository tracks my progress from i
 ## 🗂️ Roadmap
 
 **01. Terraform (Infrastructure as Code)**
-- [ ] AWS architecture provisioning, custom modules, and remote state management.
+- [x] AWS architecture provisioning, custom modules, and remote state management.
 
 **02. Ansible (Configuration Management)**
 - [ ] Playbooks, Dynamic Inventory, and Server Configuration.
