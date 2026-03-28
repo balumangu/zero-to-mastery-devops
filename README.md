@@ -15,14 +15,14 @@ Welcome to my DevOps learning journey! This repository tracks my progress from i
 **02. Ansible (Configuration Management)**
 - [ ] Playbooks, Dynamic Inventory, and Server Configuration.
 
-**03. Docker (Containerization)**
+**03. CI/CD Pipelines**
+- [ ] Jenkins automation, webhooks, and artifact building (Maven/JUnit).
+
+**04. Docker (Containerization)**
 - [ ] Image creation, Multi-stage builds, and Docker Compose.
 
-**04. Kubernetes (Orchestration)**
+**05. Kubernetes (Orchestration)**
 - [ ] Cluster architecture, Pods, Deployments, and Services.
-
-**05. CI/CD Pipelines**
-- [ ] Jenkins automation, webhooks, and artifact building (Maven/JUnit).
 
 **06. Monitoring (Observability)**
 - [ ] Infrastructure metrics and alerting with Prometheus and Grafana.
