@@ -12,17 +12,17 @@ Welcome to my DevOps learning journey! This repository tracks my progress from i
 **01. Terraform (Infrastructure as Code)**
 - [x] AWS architecture provisioning, custom modules, and remote state management.
 
-**02. Ansible (Configuration Management)**
-- [ ] Playbooks, Dynamic Inventory, and Server Configuration.
-
-**03. CI/CD Pipelines**
-- [ ] Jenkins automation, webhooks, and artifact building (Maven/JUnit).
-
-**04. Docker (Containerization)**
+**02. Docker (Containerization)**
 - [ ] Image creation, Multi-stage builds, and Docker Compose.
 
-**05. Kubernetes (Orchestration)**
+**03. Kubernetes (Orchestration)**
 - [ ] Cluster architecture, Pods, Deployments, and Services.
+
+**04. CI/CD Pipelines**
+- [ ] Jenkins automation, webhooks, and artifact building (Maven/JUnit).
+
+**05. Ansible (Configuration Management)**
+- [ ] Playbooks, Dynamic Inventory, and Server Configuration.
 
 **06. Monitoring (Observability)**
 - [ ] Infrastructure metrics and alerting with Prometheus and Grafana.
